@@ -1,0 +1,7 @@
+disnake
+forex_python
+pytz
+numexpr
+
+
+
