@@ -8,7 +8,7 @@ import os
 import aiohttp
 from datetime import datetime, timedelta
 
-token = 'fTJCSwgumZOR8q01IrHONqwIm0sZNxs7MifeLz64vT5z6esb8zOgZFJ8p8RNvG'
+token = 'discloud token'
 
 class Owner(commands.Cog, name = "Owner"):
     def __init__(self, bot):
