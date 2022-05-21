@@ -1,11 +1,11 @@
-
+from forx import get_price
+import decimal
 from disnake.ext import commands
 import numexpr as ne
-from forex_python.converter import CurrencyRates
 
 
 class Calculators(commands.Cog, name = "Calculators"):
-    def __init__(self, bot:commands.Bot):
+    def __init__(self, bot):
         self.bot = bot
 
     @commands.command(help = 'Calcula a expressão dada (Use `/` para divisão, `*` para multiplicação e `**`para potência)', 
@@ -17,12 +17,13 @@ class Calculators(commands.Cog, name = "Calculators"):
         except (RuntimeError, OverflowError, ValueError, SyntaxError, NameError, TypeError, ZeroDivisionError):
             await ctx.reply(f"Desculpe, eu não posso calcular `{express}` ou ocorreu um erro desconhecido.")
 
-    @commands.command(help = 'Diz a cotação do dólar em real(Infelizmente a API só atualiza uma vez ao dia', aliases = ['dol'])
+    @commands.command(help = 'Diz a cotação do dólar', aliases = ['dol'])
     async def dolar(self, ctx):
         async with ctx.typing():
-            c = CurrencyRates(force_decimal = True)
-            result = c.convert ('USD', 'BRL', 1)
-            await ctx.reply(content = f'Um dólar equivale atualmente a R${result:.3}')
+            g = str(get_price('USD', 'BRL', None)) 
+            val = decimal.Decimal(g).quantize(decimal.Decimal('0.01'))
+            vt = str(val).replace('.',",")
+            await ctx.reply(content = f'Um dólar equivale atualmente a R${vt}')
 
     @commands.command(help = 'Ping do bot com a API do Discord', aliases = ['p'])
     async def ping(self, ctx):

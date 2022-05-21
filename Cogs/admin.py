@@ -14,7 +14,7 @@ with open("configuration.json", "r") as config:
     
 
 class AdminOnly(commands.Cog, name = "Admin"):
-    def __init__(self, bot:commands.Bot):
+    def __init__(self, bot):
         self.bot = bot
 
     @commands.command(help = 'Limpa a quantidade indicada de mensagens do canal, sendo 5 por padrão', aliases = ['limpar', 'clean'])
@@ -22,9 +22,11 @@ class AdminOnly(commands.Cog, name = "Admin"):
     async def clear(self, ctx, amount = 5):
         await ctx.channel.purge(limit = amount + 1)
 
+
     @commands.Cog.listener()
     async def on_ready(self):
         print('Admin carregado!')
+
 
 
 

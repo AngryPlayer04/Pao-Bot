@@ -1,11 +1,14 @@
 import disnake
 from disnake.ext import commands 
-from random import choice, randrange
+from random import choice, randrange, randint
 import requests
+from translate import Translator
+import aiohttp
+import json
 
 
 class Util(commands.Cog, name = "Utility"):
-    def __init__(self, bot:commands.Bot):
+    def __init__(self, bot):
         self.bot = bot 
     @commands.command()
     async def flip(self, ctx):
@@ -25,12 +28,23 @@ class Util(commands.Cog, name = "Utility"):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        session = aiohttp.ClientSession()
         if message.content in ["Pão", "pão", "bread", "Bread", "Oãp","🍞"]:
-            bread = 'https://tenor.com/view/falling-bread-bread-gif-19081960',\
-                'https://tenor.com/view/cat-bread-gif-9824952',\
-                'https://tenor.com/view/toasty-the-walking-toast-bread-gif-7333840',\
-                'https://tenor.com/view/dogebred-bread-dog-spin-gif-14407769'
-            await message.reply(choice(bread))
+            if message.author.bot:
+                return
+            
+            else:
+                response = await session.get('http://api.giphy.com/v1/gifs/search?q=bread&api_key=GiIoyyWzwxGb4h8VOw62xA3mqano25E9&limit=50')
+                data = json.loads(await response.text())
+                gifch = randint(0, 49)
+                bread = (data['data'][gifch]['images']['original']['url'])
+            
+                bembed = disnake.Embed(color=0xffb354)
+                bembed.set_image(bread)
+                bembed.set_author(name="Pão Bot", icon_url="https://images-ext-2.discordapp.net/external/lK0peJ7nECCGR6-5ND3L1ysNwT1Iq1DVkHJoF19Pwcg/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/850123093077917716/2fe303ab1bf685becf029d72834b0f16.png")
+                bembed.set_footer(text='Powered by GIPHY', icon_url='https://giphy.com/static/img/about/stickers/logo-spin.gif')
+                await session.close()
+                await message.reply(embed = bembed)
             
     @commands.command(help = 'Envia o avatar de um usuário, podendo ser uma menção ou ID', aliases = ['pfp','icon', 'icone', 'ícone'])
     async def avatar(self,ctx, *, usuario: disnake.Member = None):
@@ -58,6 +72,18 @@ class Util(commands.Cog, name = "Utility"):
             dEmbed.add_field(name = 'Significado:', value = ult, inline = False) 
 
             await ctx.reply(embed = dEmbed) 
+
+    @commands.command(help = 'Traduz do inglês para o português', aliases = ['translate', 'tl', 'tradutor'])
+    async def traduzir(self, ctx, *, origem):
+        if '@everyone' in origem:
+            await ctx.reply('Nada de mencionar todo mundo')
+
+        else:
+            async with ctx.typing():
+                tl = Translator(to_lang = 'pt-br')
+                tn = tl.translate(origem)
+                await ctx.reply(tn)
+
 
 
     @commands.Cog.listener()
